@@ -105,8 +105,7 @@ namespace PM2E2GRUPO1.Views
         {
             try
             {
-
-
+                // Site contiene toda la data del item seleccionado
                 if (Site == null)
                 {
                     Message("Aviso", "Seleccione un sitio");
@@ -117,12 +116,7 @@ namespace PM2E2GRUPO1.Views
 
                 if (status)
                 {
-                    //El usuario dijo que si
-                    await Navigation.PushAsync(new MapPage(Site));
-                }
-                else
-                {
-                    //El usuario dijo que no
+                    // IR DIRRECION
                 }
 
             }
