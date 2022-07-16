@@ -17,8 +17,8 @@ namespace PM2E2GRUPO1.Views
     {
 
 
-        private Sitio Site = null;
-
+        public Sitio Site = null;
+        bool val;
         public ListSite()
         {
             InitializeComponent();
@@ -35,7 +35,7 @@ namespace PM2E2GRUPO1.Views
 
             LoadData();
 
-            Site = null;
+            //Site = null;
         }
 
 
@@ -69,9 +69,13 @@ namespace PM2E2GRUPO1.Views
                     //Delete
                     DeleteSite(Site);
                 }
-                else { 
-                    //Actualizar
-
+                else {
+                    var persona = Site;
+                    
+                    UpdateSite page = new UpdateSite();
+                    page.BindingContext = persona;
+                    await Navigation.PushAsync(page);
+                    Site = null;
                 }
             }
             catch (Exception ex)

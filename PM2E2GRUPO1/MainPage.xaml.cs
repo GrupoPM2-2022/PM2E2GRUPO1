@@ -176,6 +176,20 @@ namespace PM2E2GRUPO1
 
         }
 
+        public byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
         private async void btnList_Clicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new ListSite());
@@ -230,10 +244,10 @@ namespace PM2E2GRUPO1
         {
             Stream audioFile = audioRecorderService.GetAudioFileStream();
 
-            var mStream = new MemoryStream(File.ReadAllBytes(audioRecorderService.GetAudioFilePath()));
+            //var mStream = new MemoryStream(File.ReadAllBytes(audioRecorderService.GetAudioFilePath()));
             //var mStream = (MemoryStream)audioFile;
 
-            Byte[] bytes = mStream.ToArray();
+            Byte[] bytes = ReadFully(audioFile);
             return bytes;
         }
 
