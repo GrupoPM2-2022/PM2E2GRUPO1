@@ -1,8 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PM2E2GRUPO1.Views.SecondPage">
-    <Grid Margin="30,5,30,5">
+             x:Class="PM2E2GRUPO1.Views.ListSite"
+             xmlns:Converter="clr-namespace:PM2E2GRUPO1.Converter"
+             NavigationPage.HasNavigationBar="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Converter:ByteArrayToImage x:Key="ByteToImage" />
+        </ResourceDictionary>
+        
+    </ContentPage.Resources>
+    <Grid Padding="15">
+        
 
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -24,13 +34,12 @@
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
 
-                                <Image Source="mundo.png"
+                                <Image Source="{Binding Image,  Converter={StaticResource ByteToImage}}"
                                        Grid.Column="0"/>
 
                                 <Label Grid.Column="1" 
-                                       Text="{Binding descripcion}"
-                                       VerticalOptions="Center"
-                                       />
+                                       Text="{Binding Description}"
+                                       VerticalOptions="Center"/>
 
                             </Grid>
 
@@ -43,11 +52,12 @@
 
         <StackLayout Grid.Row="1">
 
-            <Grid Margin="20,30,30,0">
+            <Grid>
                 <Button x:Name="btnDelete"
-                            Text="Eliminar Sitio"
+                            Text="Eliminar/Actualizar"
                             HorizontalOptions="FillAndExpand"
                             Grid.Column="0"
+                            HeightRequest="60"
                             Clicked="btnDelete_Clicked"
                             />
 

@@ -1,4 +1,5 @@
-﻿using PM2E2GRUPO1.Models;
+﻿using PM2E2GRUPO1.Controller;
+using PM2E2GRUPO1.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,13 +13,13 @@ using Xamarin.Forms.Xaml;
 namespace PM2E2GRUPO1.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SecondPage : ContentPage
+    public partial class ListSite : ContentPage
     {
 
 
         private Sitio Site = null;
 
-        public SecondPage()
+        public ListSite()
         {
             InitializeComponent();
 
@@ -42,9 +43,7 @@ namespace PM2E2GRUPO1.Views
         {
             try
             {
-
                 Site = e.Item as Sitio;
-
             }
             catch (Exception ex)
             {
@@ -57,42 +56,48 @@ namespace PM2E2GRUPO1.Views
         {
             try
             {
-
-
                 if (Site == null)
                 {
                     Message("Aviso", "Seleccione un sitio");
                     return;
                 }
 
-                var status = await DisplayAlert("Aviso", $"¿Desea eliminar el sitio con descripcion: {Site.descripcion}?", "SI", "NO");
+                bool response = await Application.Current.MainPage.DisplayAlert("Aviso", "Seleccione la accion que desea realizar", "Eliminar", "Actualizar");
 
-                if (status)
+                if (response)
                 {
-                    //El usuario dijo que si
-                    //var result = await App.DBase.deleteSitio(Site);
-
-                    //if (result > 0)
-                    //{
-                    //    Message("Aviso", "El sitio fue eliminado correctamente");
-                    //    Site = null;
-                    //    LoadData();
-                    //}
-                    //else
-                    //{
-
-                    //    Message("Aviso", "No se pudo eliminar el sitio");
-                    //}
+                    //Delete
+                    DeleteSite(Site);
                 }
-                else
-                {
-                    //El usuario dijo que no
-                }
+                else { 
+                    //Actualizar
 
+                }
             }
             catch (Exception ex)
             {
                 Message("Error:", ex.Message);
+            }
+        }
+
+        private async void DeleteSite(Sitio site)
+        {
+            var status = await DisplayAlert("Aviso", $"¿Desea eliminar el sitio con Description: {Site.Description}?", "SI", "NO");
+
+            if (status)
+            {
+                var result = await SitioController.DeleteSite(Site.Id.ToString());
+
+                if (result)
+                {
+                    Message("Aviso", "El sitio fue eliminado correctamente");
+                    Site = null;
+                    LoadData();
+                }
+                else
+                {
+                    Message("Aviso", "No se pudo eliminar el sitio");
+                }
             }
         }
 
@@ -132,9 +137,7 @@ namespace PM2E2GRUPO1.Views
         {
             try
             {
-                //listSites.ItemsSource = await App.DBase.getListSitio();
-
-
+                listSites.ItemsSource = await SitioController.GetAllSite();
             }
             catch (Exception ex)
             {

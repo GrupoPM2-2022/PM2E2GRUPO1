@@ -35,8 +35,7 @@
                        Aspect="AspectFit"
                        HorizontalOptions="Center" 
                        WidthRequest="300"
-                       HeightRequest="220"
-                       >
+                       HeightRequest="220" >
 
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
@@ -47,7 +46,7 @@
             </StackLayout>
 
             <Label Text="Latitude:" 
-               Margin="30,30,0,0"
+               Margin="30,10,0,0"
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
@@ -60,7 +59,7 @@
                    />
 
             <Label Text="Longitud:" 
-               Margin="30,30,0,0"
+               Margin="30,10,0,0"
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
@@ -73,7 +72,7 @@
                    />
 
             <Label Text="Descripcion:" 
-               Margin="30,30,0,0"
+               Margin="30,10,0,0"
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
@@ -86,21 +85,29 @@
                     Placeholder="Lancetilla Tela, Atlantida"
                     />
 
+            <Label Text="Grabar nota de voz"
+                x:Name="txtMessage"   
+               Margin="30,10,0,0"
+               HorizontalOptions="StartAndExpand" 
+               FontSize="20"/>
 
-            <Grid Margin="20,30,30,0">
+            <Button Text="Grabar audio" 
+                    x:Name="btnGrabar" 
+                    Margin="30,0,30,0"
+                    Clicked="btnGrabar_Clicked"/>
+
+            <Grid Margin="20,10,30,0">
                 <Button x:Name="btnAdd"
                             Text="Agregar"
                             HorizontalOptions="FillAndExpand"
                             Grid.Column="0"
-                            Clicked="btnAdd_Clicked"
-                            />
+                            Clicked="btnAdd_Clicked"/>
 
                 <Button x:Name="btnList"
                             Text="Lista Sitios"
                             HorizontalOptions="FillAndExpand"
                             Grid.Column="1"
-                            Clicked="btnList_Clicked"
-                            />
+                            Clicked="btnList_Clicked"/>
             </Grid>
 
 

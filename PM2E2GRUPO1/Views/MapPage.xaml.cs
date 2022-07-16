@@ -43,9 +43,9 @@ namespace PM2E2GRUPO1.Views
                         var pin = new Pin()
                         {
                             Type = PinType.SavedPin,
-                            Position = new Position(Sitio.latitude, Sitio.longitude),
-                            Label = "Descripcion",
-                            Address = Sitio.descripcion
+                            Position = new Position(Sitio.Latitude, Sitio.Longitude),
+                            Label = "Description",
+                            Address = Sitio.Description
 
                         };
 
@@ -55,7 +55,7 @@ namespace PM2E2GRUPO1.Views
                         //mapa.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(localizacion.Latitude, localizacion.Longitude), Distance.FromMeters(100)));
 
 
-                        mapa.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(Sitio.latitude, Sitio.longitude), Distance.FromMeters(100)));
+                        mapa.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(Sitio.Latitude, Sitio.Longitude), Distance.FromMeters(100)));
 
                     }
 
@@ -92,23 +92,23 @@ namespace PM2E2GRUPO1.Views
                 //folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), Sitio.nameImage);
 
                 // if(!File.Exists(Path.GetFileName(Sitio.pathImage)))
-                //   File.WriteAllBytes(Sitio.pathImage, Sitio.image);
+                //   File.WriteAllBytes(Sitio.pathImage, Sitio.Image);
 
-                var image = new ShareFile(Sitio.pathImage);
-
-
-                if (image == null)
-                {
-                    Message("Aviso", "No se pudo compartir la imagen");
-                    return;
-                }
+                //var Image = new ShareFile(Sitio.pathImage);
 
 
-                await Share.RequestAsync(new ShareFileRequest
-                {
-                    Title = Sitio.descripcion,
-                    File = image
-                });
+                //if (Image == null)
+                //{
+                //    Message("Aviso", "No se pudo compartir la imagen");
+                //    return;
+                //}
+
+
+                //await Share.RequestAsync(new ShareFileRequest
+                //{
+                //    Title = Sitio.Description,
+                //    File = Image
+                //});
 
             }
             catch (Exception ex)

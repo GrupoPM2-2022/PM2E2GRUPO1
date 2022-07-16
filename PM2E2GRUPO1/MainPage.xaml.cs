@@ -1,6 +1,7 @@
 ﻿using Plugin.Media;
 using Plugin.Media.Abstractions;
 using PM2E2GRUPO1.Models;
+using PM2E2GRUPO1.Views;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,20 +11,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Plugin.AudioRecorder;
+using PM2E2GRUPO1.Controller;
 
 namespace PM2E2GRUPO1
 {
     public partial class MainPage : ContentPage
     {
+        byte[] Image;
+        private AudioRecorderService audioRecorderService = new AudioRecorderService()
+        {
+            StopRecordingOnSilence = false,
+            StopRecordingAfterTimeout = false
+        };
+
+        private AudioPlayer audioPlayer = new AudioPlayer();
+
+        private bool reproducir = false;
         MediaFile FileFoto = null;
 
         public MainPage()
         {
             InitializeComponent();
-
-            //Para que al inicializar cree la base de datos y no de error, y no esperar a
-            //llamar la instancia para crearla
-            //if (App.DBase == null) Debug.WriteLine("Creando base de datos");
         }
 
 
@@ -35,46 +44,70 @@ namespace PM2E2GRUPO1
 
         private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
+            bool response = await Application.Current.MainPage.DisplayAlert("Advertencia", "Seleccione el tipo de imagen que desea", "Camara", "Galeria");
 
-            var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+            if (response)
+                GetImageFromCamera();
+            else
+                GetImageFromGallery();
+            
+        }
 
+        private async void GetImageFromGallery()
+        {
+            try
+            {
+                if (CrossMedia.Current.IsPickPhotoSupported)
+                {
+                    var FileFoto = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
+                    {
+                        PhotoSize = PhotoSize.Medium,
+                    });
+                    if (FileFoto == null)
+                        return;
 
+                    imgFoto.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
+                    Image = File.ReadAllBytes(FileFoto.Path);
+                }
+                else
+                {
+                    Message("Advertencia", "Se produjo un error al seleccionar la imagen");
+                }
+            }
+            catch (Exception)
+            {
+                Message("Advertencia", "Se produjo un error al seleccionar la imagen");
+            }
+
+        }
+
+        private async void GetImageFromCamera()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.Photos>();
             if (status == PermissionStatus.Granted)
             {
                 try
                 {
                     FileFoto = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
                     {
-
-                        Directory = "MisUbicaciones",
-                        AllowCropping = true,
-                        CustomPhotoSize = 30,
-                        CompressionQuality = 30
-
+                        PhotoSize = PhotoSize.Medium,
                     });
 
+                    if (FileFoto == null)
+                        return;
 
-                    if (FileFoto != null)
-                    {
-                        imgFoto.Source = ImageSource.FromStream(() => {
-                            return FileFoto.GetStream();
-                        });
-                    }
-
-                    //await DisplayAlert("Direcctorio", FileFoto.Path, "OK");
+                    imgFoto.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
+                    Image = File.ReadAllBytes(FileFoto.Path);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    await DisplayAlert("Error", ex.Message, "OK");
+                    Message("Advertencia", "Se produjo un error al tomar la fotografia.");
                 }
-
             }
             else
             {
                 await Permissions.RequestAsync<Permissions.Camera>();
             }
-
-
         }
 
         private void btnExit_Clicked(object sender, EventArgs e)
@@ -84,12 +117,11 @@ namespace PM2E2GRUPO1
 
         private async void btnAdd_Clicked(object sender, EventArgs e)
         {
-            if (FileFoto == null)
+            if (Image == null)
             {
                 Message("Aviso", "Aun no se a tomado una foto: Presione la imagen de ejemplo para capturar una imagen");
                 return;
             }
-
 
             if (string.IsNullOrEmpty(txtLatitude.Text) || string.IsNullOrEmpty(txtLongitude.Text))
             {
@@ -98,10 +130,15 @@ namespace PM2E2GRUPO1
                 return;
             }
 
-
-            if (string.IsNullOrEmpty(txtDescription.Text))
+            if (string.IsNullOrEmpty(txtDescription.Text) || txtDescription.Text.Length > 250)
             {
-                Message("Aviso", "Debe escribir una breve descripcion");
+                Message("Aviso", "Debe escribir una breve Description");
+                return;
+            }
+
+            if (!reproducir)
+            {
+                Message("Aviso", "No ha grabado ningun audio");
                 return;
             }
 
@@ -110,25 +147,25 @@ namespace PM2E2GRUPO1
             {
                 var sitio = new Sitio()
                 {
-                    id = 0,
-                    latitude = double.Parse(txtLatitude.Text),
-                    longitude = double.Parse(txtLongitude.Text),
-                    descripcion = txtDescription.Text,
-                    image = ConvertImageToByteArray(),
-                    pathImage = FileFoto.Path
+                    Latitude = double.Parse(txtLatitude.Text),
+                    Longitude = double.Parse(txtLongitude.Text),
+                    Description = txtDescription.Text,
+                    Image = Image,
+                    AudioFile = ConvertAudioToByteArray()
+                    //pathImage = FileFoto.Path
                 };
 
-                //var result = await App.DBase.insertUpdateSitio(sitio);
+                var result = await SitioController.CreateSite(sitio);
 
-                //if (result > 0)
-                //{
-                //    Message("Aviso", "Sitio agregado correctamente");
-                //    clearComp();
-                //}
-                //else
-                //{
-                //    Message("Aviso", "No se pudo agregar el sitio");
-                //}
+                if (result)
+                {
+                    Message("Aviso", "Sitio agregado correctamente");
+                    clearComp();
+                }
+                else
+                {
+                    Message("Aviso", "No se pudo agregar el sitio");
+                }
 
             }
             catch (Exception ex)
@@ -141,25 +178,20 @@ namespace PM2E2GRUPO1
 
         private async void btnList_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new SecondPage());
+            await Navigation.PushAsync(new ListSite());
         }
 
         private async void getLatitudeAndLongitude()
         {
             try
             {
-
                 var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-
 
                 if (status == PermissionStatus.Granted)
                 {
-
                     var localizacion = await Geolocation.GetLocationAsync();
-
                     txtLatitude.Text = Math.Round(localizacion.Latitude, 5) + "";
                     txtLongitude.Text = Math.Round(localizacion.Longitude, 5) + "";
-
                 }
                 else
                 {
@@ -169,8 +201,6 @@ namespace PM2E2GRUPO1
             }
             catch (Exception e)
             {
-
-
 
                 if (e.Message.Equals("Location services are not enabled on device."))
                 {
@@ -190,12 +220,22 @@ namespace PM2E2GRUPO1
         {
             imgFoto.Source = "imgMuestra.png";
             txtDescription.Text = "";
-            FileFoto = null;
+            Image = null;
             getLatitudeAndLongitude();
         }
 
 
         #region Metodos Utiles
+        private Byte[] ConvertAudioToByteArray()
+        {
+            Stream audioFile = audioRecorderService.GetAudioFileStream();
+
+            var mStream = new MemoryStream(File.ReadAllBytes(audioRecorderService.GetAudioFilePath()));
+            //var mStream = (MemoryStream)audioFile;
+
+            Byte[] bytes = mStream.ToArray();
+            return bytes;
+        }
 
         private Byte[] ConvertImageToByteArray()
         {
@@ -220,5 +260,48 @@ namespace PM2E2GRUPO1
         }
 
         #endregion Metodos Utiles
+
+        private async void btnGrabar_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var status = await Permissions.RequestAsync<Permissions.Microphone>();
+                var status2 = await Permissions.RequestAsync<Permissions.StorageRead>();
+                var status3 = await Permissions.RequestAsync<Permissions.StorageWrite>();
+                if (status != PermissionStatus.Granted & status2 != PermissionStatus.Granted & status3 != PermissionStatus.Granted)
+                {
+                    return; // si no tiene los permisos no avanza
+                }
+
+                if (audioRecorderService.IsRecording)
+                {
+                    await audioRecorderService.StopRecording();
+
+
+                    audioPlayer.Play(audioRecorderService.GetAudioFilePath());
+
+                    txtMessage.Text = "No esta grabando";
+                    btnGrabar.Text = "Grabar audio";
+
+                    reproducir = true;
+                }
+                else
+                {
+                    await audioRecorderService.StartRecording();
+
+
+                    txtMessage.Text = "Esta grabando";
+
+                    btnGrabar.Text = "Dejar de Grabar";
+
+                    //reproducir = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Alerta", ex.Message, "OK");
+            }
+
+        }
     }
 }
