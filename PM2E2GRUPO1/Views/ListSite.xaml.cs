@@ -36,7 +36,7 @@ namespace PM2E2GRUPO1.Views
 
             LoadData();
 
-            //Site = null;
+            Site = null;
         }
 
 
