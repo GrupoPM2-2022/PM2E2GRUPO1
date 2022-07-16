@@ -1,4 +1,5 @@
-﻿using PM2E2GRUPO1.Controller;
+﻿using PM2E10280.Views;
+using PM2E2GRUPO1.Controller;
 using PM2E2GRUPO1.Models;
 using System;
 using System.Collections.Generic;
@@ -120,7 +121,7 @@ namespace PM2E2GRUPO1.Views
 
                 if (status)
                 {
-                    // IR DIRRECION
+                    await Navigation.PushAsync(new MapPage(Site));
                 }
 
             }
