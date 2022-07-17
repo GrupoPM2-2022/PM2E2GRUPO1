@@ -1,9 +1,12 @@
-﻿using PM2E10280.Views;
+﻿using Acr.UserDialogs;
+using Plugin.AudioRecorder;
+using PM2E10280.Views;
 using PM2E2GRUPO1.Controller;
 using PM2E2GRUPO1.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +23,9 @@ namespace PM2E2GRUPO1.Views
 
         public Sitio Site = null;
         bool val;
+
+        private readonly AudioPlayer audioPlayer = new AudioPlayer();
+
         public ListSite()
         {
             InitializeComponent();
@@ -45,6 +51,8 @@ namespace PM2E2GRUPO1.Views
             try
             {
                 Site = e.Item as Sitio;
+
+                listeAudio(Site.AudioFile);
             }
             catch (Exception ex)
             {
@@ -134,12 +142,21 @@ namespace PM2E2GRUPO1.Views
 
         private async void LoadData()
         {
+
             try
             {
+                UserDialogs.Instance.ShowLoading("Cargando", MaskType.Clear);
+
                 listSites.ItemsSource = await SitioController.GetAllSite();
+
+                await Task.Delay(500);
+                UserDialogs.Instance.HideLoading();
             }
             catch (Exception ex)
             {
+                UserDialogs.Instance.HideLoading();
+                await Task.Delay(500);
+
                 Message("Error: ", ex.Message);
             }
         }
@@ -155,6 +172,48 @@ namespace PM2E2GRUPO1.Views
 
         #endregion Metodos Utiles
 
+        private void listeAudio(byte[] bytes)
+        {
+            //using (MemoryStream ms = new MemoryStream(bytes))
+            //{
+            // Construct the sound player
+            //audioPlayer.Play(ms.);
+            //}
 
+
+            var folderPath = "/storage/emulated/0/Android/data/com.companyname.pm2e2grupo1/files/Audio";
+
+           
+
+            //var nameAudio = DateTime.Now.ToString("MMddyyyyhhmmss") + ".wav";
+
+            var nameAudio = "temp.wav";
+
+            var fullPath = folderPath + "/" + nameAudio;
+
+            try
+            {
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                if (File.Exists(fullPath))
+                    File.Delete(fullPath);
+
+                Stream stream = new MemoryStream(bytes);
+
+                using (var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                {
+                    stream.CopyTo(fileStream);
+                }
+
+                audioPlayer.Play(fullPath);
+            }
+            catch (Exception ex)
+            {
+
+                Message("Error: ", ex.Message);
+            }
+
+        }
     }
 }

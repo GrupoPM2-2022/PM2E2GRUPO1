@@ -13,6 +13,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Plugin.AudioRecorder;
 using PM2E2GRUPO1.Controller;
+using Acr.UserDialogs;
 
 namespace PM2E2GRUPO1
 {
@@ -145,6 +146,9 @@ namespace PM2E2GRUPO1
 
             try
             {
+
+                UserDialogs.Instance.ShowLoading("Guardando Sitio", MaskType.Clear);
+
                 var sitio = new Sitio()
                 {
                     Latitude = double.Parse(txtLatitude.Text),
@@ -156,6 +160,9 @@ namespace PM2E2GRUPO1
                 };
 
                 var result = await SitioController.CreateSite(sitio);
+
+                UserDialogs.Instance.HideLoading();
+                await Task.Delay(500);
 
                 if (result)
                 {
@@ -170,9 +177,13 @@ namespace PM2E2GRUPO1
             }
             catch (Exception ex)
             {
-
+                UserDialogs.Instance.HideLoading();
+                
+                await Task.Delay(500);
+                
                 Message("Error: ", ex.Message);
             }
+            
 
         }
 

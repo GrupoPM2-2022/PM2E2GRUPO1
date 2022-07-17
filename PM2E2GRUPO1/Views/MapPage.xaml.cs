@@ -45,7 +45,7 @@ namespace PM2E10280.Views
                         
                         var pin = new Pin()
                         {   
-                            Type = PinType.SavedPin,
+                            Type = PinType.SearchResult,
                             Position = new Position(Sitio.Latitude, Sitio.Longitude),
                             Label = "Descripcion",
                             Address = Sitio.Description
@@ -57,7 +57,6 @@ namespace PM2E10280.Views
 
                         //mapa.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(localizacion.Latitude, localizacion.Longitude), Distance.FromMeters(100)));
                        
-
                         mapa.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(Sitio.Latitude, Sitio.Longitude), Distance.FromMeters(100)));
 
                     }
