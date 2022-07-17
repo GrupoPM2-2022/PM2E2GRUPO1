@@ -129,6 +129,15 @@ namespace PM2E2GRUPO1.Views
 
         private async void btnAdd_Clicked(object sender, EventArgs e)
         {
+
+            var current = Connectivity.NetworkAccess;
+
+            if (current != NetworkAccess.Internet)
+            {
+                Message("Advertencia", "Actualmente no cuenta con acceso a internet");
+                return;
+            }
+
             Byte[] audio;
 
             if (Image == null)
@@ -140,6 +149,13 @@ namespace PM2E2GRUPO1.Views
             {
                 Message("Aviso", "No hay una localizacion");
                 //getLatitudeAndLongitude();
+                return;
+            }
+
+            if (txtDescription.Text.Length > 15)
+            {
+                Message("Aviso", "Debe escribir una ubicacion corta");
+                
                 return;
             }
 
@@ -155,6 +171,15 @@ namespace PM2E2GRUPO1.Views
             }
             else
             {
+
+                var length = ConvertAudioToByteArray().Length;
+
+                if (length > 1500000)
+                {
+                    Message("Aviso", "El audio debe ser mas corto");
+                    return;
+                }
+
                 audio = ConvertAudioToByteArray();
             }
 
@@ -223,13 +248,7 @@ namespace PM2E2GRUPO1.Views
             try
             {
 
-                //var current = Connectivity.NetworkAccess;
-
-                //if (current != NetworkAccess.Internet)
-                //{
-                //    Message("Advertencia", "Actualmente no cuenta con acceso a internet");
-                //    return;
-                //}
+               
 
                 UserDialogs.Instance.ShowLoading("Obteniendo la nueva localizacion", MaskType.Clear);
 

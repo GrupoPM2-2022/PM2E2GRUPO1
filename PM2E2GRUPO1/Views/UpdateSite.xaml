@@ -123,9 +123,9 @@
                             Clicked="btnAdd_Clicked"/>
 
                 <Button x:Name="btnUpdateLocation"
-                            Text="Actualizar Localizacion"
+                            Text="Nueva Localizacion"
                             HorizontalOptions="FillAndExpand"
-                            FontSize="15"
+                            FontSize="12"
                             Grid.Column="1"
                             Clicked="btnUpdateLocation_Clicked"/>
             </Grid>

@@ -114,6 +114,15 @@ namespace PM2E2GRUPO1
 
         private async void btnAdd_Clicked(object sender, EventArgs e)
         {
+
+            var current = Connectivity.NetworkAccess;
+
+            if (current != NetworkAccess.Internet)
+            {
+                Message("Advertencia", "Actualmente no cuenta con acceso a internet");
+                return;
+            }
+
             if (Image == null)
             {
                 Message("Aviso", "Aun no se a tomado una foto: Presione la imagen de ejemplo para capturar una imagen");
@@ -133,9 +142,25 @@ namespace PM2E2GRUPO1
                 return;
             }
 
+            if (txtDescription.Text.Length > 15)
+            {
+                Message("Aviso", "Debe escribir una ubicacion corta");
+
+                return;
+            }
+
             if (!reproducir)
             {
                 Message("Aviso", "No ha grabado ningun audio");
+                return;
+            }
+
+
+            var length = ConvertAudioToByteArray().Length;
+
+            if (length > 1500000)
+            {
+                Message("Aviso", "El audio debe ser mas corto");
                 return;
             }
 
@@ -206,13 +231,6 @@ namespace PM2E2GRUPO1
         {
             try
             {
-
-                //var current = Connectivity.NetworkAccess;
-
-                //if (current != NetworkAccess.Internet)
-                //{
-                //    Message("Advertencia", "Actualmente no cuenta con acceso a internet");
-                //}
 
                 var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
