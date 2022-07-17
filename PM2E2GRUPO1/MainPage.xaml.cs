@@ -206,6 +206,14 @@ namespace PM2E2GRUPO1
         {
             try
             {
+
+                //var current = Connectivity.NetworkAccess;
+
+                //if (current != NetworkAccess.Internet)
+                //{
+                //    Message("Advertencia", "Actualmente no cuenta con acceso a internet");
+                //}
+
                 var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
                 if (status == PermissionStatus.Granted)

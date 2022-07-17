@@ -4,40 +4,44 @@
              x:Class="PM2E2GRUPO1.Views.UpdateSite"
              xmlns:Converter="clr-namespace:PM2E2GRUPO1.Converter"
              NavigationPage.HasNavigationBar="False">
+    
     <ContentPage.Resources>
         <ResourceDictionary>
             <Converter:ByteArrayToImage x:Key="ByteToImage" />
         </ResourceDictionary>
-
     </ContentPage.Resources>
-    <ContentPage.Content>
+    
+    <ScrollView>
         <StackLayout>
+
+            <Frame Padding="0,0,0,0" HeightRequest="40">
+                <Grid>
+                    <Label Text="Actualizando Sitio" 
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="Black" 
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       />
+
+                    <Button Text="Atras"
+                        HorizontalOptions="Start"
+                        Clicked="Button_Clicked"
+                                 />
+                </Grid>
+
+
+            </Frame>
 
 
             <Grid>
-                <Entry 
-                   Keyboard="Text" 
-                   x:Name="txtIdE" 
-                IsVisible="false"
-                   BackgroundColor="White"
-                   
-                   Text="{Binding Id}"/>
-                
                 <Image Source="logo.png"
                Aspect="AspectFit"
                WidthRequest="110"
                Grid.Row="0"
-               Grid.Column="0"
-               HorizontalOptions="End"
+               Grid.ColumnSpan="2"
+               HorizontalOptions="Center"
                />
-
-                <Label Text="ACTUALIZAR SITE VISITOR APP"
-                   Grid.Row="0"
-                   Grid.Column="1"
-                   HorizontalOptions="Start"
-                   VerticalOptions="Center"
-                   />
-
             </Grid>
 
             <StackLayout>
@@ -45,14 +49,12 @@
                    HorizontalOptions="Center"
                    />
 
-                <Image x:Name="imgFotoE"
-                       Source="{Binding Image,  Converter={StaticResource ByteToImage}}"
+                <Image x:Name="imgFoto"
+                       Source="imgMuestra.png"
                        Aspect="AspectFit"
                        HorizontalOptions="Center" 
                        WidthRequest="300"
-                       HeightRequest="220"
-                       
-                      >
+                       HeightRequest="220" >
 
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
@@ -67,13 +69,12 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Entry x:Name="txtLatitudeE"
+            <Entry x:Name="txtLatitude"
                    Keyboard="Numeric"
                    Placeholder="Ejemplo: 15.67"
                    HorizontalOptions="FillAndExpand" 
                    Margin="30,0,30,0"
                    IsEnabled="False"
-                   Text="{Binding Latitude}"
                    />
 
             <Label Text="Longitud:" 
@@ -81,13 +82,12 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Entry x:Name="txtLongitudeE"
+            <Entry x:Name="txtLongitude"
                    Keyboard="Numeric"
                    Placeholder="Ejemplo: -81.78"
                    HorizontalOptions="FillAndExpand" 
                    Margin="30,0,30,0"
                    IsEnabled="False"
-                   Text="{Binding Longitude}"
                    />
 
             <Label Text="Descripcion:" 
@@ -95,17 +95,16 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Editor x:Name="txtDescriptionE"
+            <Editor x:Name="txtDescription"
                     Keyboard="Text"
                     AutoSize="TextChanges"
                     MaxLength="50"
                     HorizontalOptions="FillAndExpand"
                     Margin="30,0,30,0"
                     Placeholder="Lancetilla Tela, Atlantida"
-                    Text="{Binding Description}"
                     />
 
-            <Label Text="Actualizar nota de voz"
+            <Label Text="Grabar nota de voz"
                 x:Name="txtMessage"   
                Margin="30,10,0,0"
                HorizontalOptions="StartAndExpand" 
@@ -113,18 +112,28 @@
 
             <Button Text="Grabar audio" 
                     x:Name="btnGrabar" 
-                    Margin="30,0,30,0"
+                    Margin="20,0,20,0"
                     Clicked="btnGrabar_Clicked"/>
 
-            <Grid Margin="20,10,30,0">
-                <Button x:Name="btnActualizar"
+            <Grid Margin="20,10,20,0">
+                <Button x:Name="btnAdd"
                             Text="Actualizar"
                             HorizontalOptions="FillAndExpand"
                             Grid.Column="0"
-                            Clicked="btnActualizar_Clicked"/>
+                            Clicked="btnAdd_Clicked"/>
+
+                <Button x:Name="btnUpdateLocation"
+                            Text="Actualizar Localizacion"
+                            HorizontalOptions="FillAndExpand"
+                            FontSize="15"
+                            Grid.Column="1"
+                            Clicked="btnUpdateLocation_Clicked"/>
             </Grid>
 
 
+
         </StackLayout>
-    </ContentPage.Content>
+    </ScrollView>
+    
+    
 </ContentPage>

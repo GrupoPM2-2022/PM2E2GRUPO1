@@ -8,12 +8,12 @@
     
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <Frame Padding="0,0,0,0" HeightRequest="50" Grid.Row="0" Grid.Column="0">
+        <Frame Padding="0,0,0,0" HeightRequest="40" Grid.Row="0" Grid.Column="0">
             <Grid>
                 <Label Text="Mapa del Sitio" 
                        HorizontalOptions="Center"

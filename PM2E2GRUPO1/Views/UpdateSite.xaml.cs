@@ -1,4 +1,5 @@
-﻿using Plugin.AudioRecorder;
+﻿using Acr.UserDialogs;
+using Plugin.AudioRecorder;
 using Plugin.Media;
 using Plugin.Media.Abstractions;
 using PM2E2GRUPO1.Controller;
@@ -27,19 +28,307 @@ namespace PM2E2GRUPO1.Views
 
         private AudioPlayer audioPlayer = new AudioPlayer();
 
-        private bool reproducir = false;
+
         MediaFile FileFoto = null;
-        public UpdateSite()
+
+        Sitio sitio;
+
+        private bool reproducir = false;
+
+        public UpdateSite(Sitio sitio)
         {
             InitializeComponent();
+
+            this.sitio = sitio;
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            LoadData();
+        }
+
+        void LoadData()
+        {
+            imgFoto.Source = GetImageResourseFromBytes(sitio.Image);
+            txtLatitude.Text = sitio.Latitude.ToString();
+            txtLongitude.Text = sitio.Longitude.ToString();
+            txtDescription.Text = sitio.Description;
+        }
+
+
+        private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+        {
+            bool response = await Application.Current.MainPage.DisplayAlert("Advertencia", "Seleccione el tipo de imagen que desea", "Camara", "Galeria");
+
+            if (response)
+                GetImageFromCamera();
+            else
+                GetImageFromGallery();
+
+        }
+
+        private async void GetImageFromGallery()
+        {
+            try
+            {
+                if (CrossMedia.Current.IsPickPhotoSupported)
+                {
+                    var FileFoto = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
+                    {
+                        PhotoSize = PhotoSize.Medium,
+                    });
+                    if (FileFoto == null)
+                        return;
+
+                    imgFoto.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
+                    Image = File.ReadAllBytes(FileFoto.Path);
+                }
+                else
+                {
+                    Message("Advertencia", "Se produjo un error al seleccionar la imagen");
+                }
+            }
+            catch (Exception)
+            {
+                Message("Advertencia", "Se produjo un error al seleccionar la imagen");
+            }
+
+        }
+
+        private async void GetImageFromCamera()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.Photos>();
+            if (status == PermissionStatus.Granted)
+            {
+                try
+                {
+                    FileFoto = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
+                    {
+                        PhotoSize = PhotoSize.Medium,
+                        SaveToAlbum = true
+                    });
+
+                    if (FileFoto == null)
+                        return;
+
+                    imgFoto.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
+                    Image = File.ReadAllBytes(FileFoto.Path);
+                }
+                catch (Exception)
+                {
+                    Message("Advertencia", "Se produjo un error al tomar la fotografia.");
+                }
+            }
+            else
+            {
+                await Permissions.RequestAsync<Permissions.Camera>();
+            }
+        }
+
+        private async void btnAdd_Clicked(object sender, EventArgs e)
+        {
+            Byte[] audio;
+
+            if (Image == null)
+            {
+                Image = sitio.Image;
+            }
+
+            if (string.IsNullOrEmpty(txtLatitude.Text) || string.IsNullOrEmpty(txtLongitude.Text))
+            {
+                Message("Aviso", "No hay una localizacion");
+                //getLatitudeAndLongitude();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtDescription.Text) || txtDescription.Text.Length > 250)
+            {
+                Message("Aviso", "Debe escribir una breve Description");
+                return;
+            }
+
+            if (!reproducir)
+            {
+                audio = sitio.AudioFile;
+            }
+            else
+            {
+                audio = ConvertAudioToByteArray();
+            }
+
+
+            try
+            {
+
+                UserDialogs.Instance.ShowLoading("Actualizando Sitio", MaskType.Clear);
+
+                var sitio = new Sitio()
+                {
+                    Id = this.sitio.Id,
+                    Latitude = double.Parse(txtLatitude.Text),
+                    Longitude = double.Parse(txtLongitude.Text),
+                    Description = txtDescription.Text,
+                    Image = Image,
+                    AudioFile = audio
+                    //pathImage = FileFoto.Path
+                };
+
+                var result = await SitioController.UpdateSitio(sitio);
+
+                UserDialogs.Instance.HideLoading();
+                await Task.Delay(500);
+
+                if (result)
+                {
+                    Message("Aviso", "Sitio actualizado correctamente");
+                    //clearComp();
+                }
+                else
+                {
+                    Message("Aviso", "No se pudo actualizar el sitio");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                UserDialogs.Instance.HideLoading();
+
+                await Task.Delay(500);
+
+                Message("Error: ", ex.Message);
+            }
+
+
+        }
+
+        public byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
+
+        private async void getLatitudeAndLongitude()
+        {
+            try
+            {
+
+                //var current = Connectivity.NetworkAccess;
+
+                //if (current != NetworkAccess.Internet)
+                //{
+                //    Message("Advertencia", "Actualmente no cuenta con acceso a internet");
+                //    return;
+                //}
+
+                UserDialogs.Instance.ShowLoading("Obteniendo la nueva localizacion", MaskType.Clear);
+
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+
+                if (status == PermissionStatus.Granted)
+                {
+                    
+
+                    var localizacion = await Geolocation.GetLocationAsync();
+                    txtLatitude.Text = Math.Round(localizacion.Latitude, 5) + "";
+                    txtLongitude.Text = Math.Round(localizacion.Longitude, 5) + "";
+
+                    UserDialogs.Instance.HideLoading();
+                }
+                else
+                {
+                    UserDialogs.Instance.HideLoading();
+
+                    await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
+            }
+            catch (Exception e)
+            {
+
+
+                UserDialogs.Instance.HideLoading();
+
+                if (e.Message.Equals("Location services are not enabled on device."))
+                {
+
+                    Message("Error", "Servicio de localizacion no encendido");
+                }
+                else
+                {
+                    Message("Error", e.Message);
+                }
+
+            }
+        }
+
+        private void clearComp()
+        {
+            imgFoto.Source = "imgMuestra.png";
+            txtDescription.Text = "";
+            Image = null;
             getLatitudeAndLongitude();
         }
 
+
+        #region Metodos Utiles
+        private Byte[] ConvertAudioToByteArray()
+        {
+            Stream audioFile = audioRecorderService.GetAudioFileStream();
+
+            //var mStream = new MemoryStream(File.ReadAllBytes(audioRecorderService.GetAudioFilePath()));
+            //var mStream = (MemoryStream)audioFile;
+
+            Byte[] bytes = ReadFully(audioFile);
+            return bytes;
+        }
+
+        private Byte[] ConvertImageToByteArray()
+        {
+            if (FileFoto != null)
+            {
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    Stream stream = FileFoto.GetStream();
+
+                    stream.CopyTo(memory);
+
+                    return memory.ToArray();
+                }
+            }
+
+            return null;
+        }
+
+        private async void Message(string title, string message)
+        {
+            await DisplayAlert(title, message, "OK");
+        }
+
+        #endregion Metodos Utiles
+
+
+        private ImageSource GetImageResourseFromBytes(byte[] bytes)
+        {
+            ImageSource retSource = null;
+
+            if (bytes != null)
+            {
+                byte[] imageAsBytes = (byte[])bytes;
+                retSource = ImageSource.FromStream(() => new MemoryStream(imageAsBytes));
+            }
+
+            return retSource;
+        }
 
         private async void btnGrabar_Clicked(object sender, EventArgs e)
         {
@@ -61,6 +350,9 @@ namespace PM2E2GRUPO1.Views
                     audioPlayer.Play(audioRecorderService.GetAudioFilePath());
 
                     txtMessage.Text = "No esta grabando";
+
+                    txtMessage.TextColor = Color.Red;
+
                     btnGrabar.Text = "Grabar audio";
 
                     reproducir = true;
@@ -72,6 +364,8 @@ namespace PM2E2GRUPO1.Views
 
                     txtMessage.Text = "Esta grabando";
 
+                    txtMessage.TextColor = Color.Green;
+
                     btnGrabar.Text = "Dejar de Grabar";
 
                     //reproducir = false;
@@ -81,186 +375,19 @@ namespace PM2E2GRUPO1.Views
             {
                 await DisplayAlert("Alerta", ex.Message, "OK");
             }
+
         }
 
-        private async void btnActualizar_Clicked(object sender, EventArgs e)
+
+        private void Button_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtDescriptionE.Text) || txtDescriptionE.Text.Length > 250)
-            {
-                Message("Aviso", "Debe escribir una breve Description");
-                return;
-            }
-
-            try
-            {
-                var idSitio = (string.IsNullOrEmpty(txtIdE.Text)) ? 0 : int.Parse(txtIdE.Text);
-                
-                var sitio = new Sitio()
-                {
-                    Id = idSitio,
-                    Latitude = double.Parse(txtLatitudeE.Text),
-                    Longitude = double.Parse(txtLongitudeE.Text),
-                    Description = txtDescriptionE.Text,
-                    Image = Image,
-                    AudioFile = ConvertAudioToByteArray()
-                    //pathImage = FileFoto.Path
-                };
-
-                var result = await SitioController.UpdateSitio(sitio);
-
-                if (result)
-                {
-                    Message("Aviso", "Sitio Actualizado correctamente");
-                    
-                }
-                else
-                {
-                    Message("Aviso", "No se pudo Actualizar el sitio");
-                }
-
-            }
-            catch (Exception ex)
-            {
-
-                Message("Error: ", ex.Message);
-            }
+            OnBackButtonPressed();
         }
 
-
-        private async void getLatitudeAndLongitude()
+        private void btnUpdateLocation_Clicked(object sender, EventArgs e)
         {
-            try
-            {
-                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-
-                if (status == PermissionStatus.Granted)
-                {
-                    var localizacion = await Geolocation.GetLocationAsync();
-                    txtLatitudeE.Text = Math.Round(localizacion.Latitude, 5) + "";
-                    txtLongitudeE.Text = Math.Round(localizacion.Longitude, 5) + "";
-                }
-                else
-                {
-
-                    await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-                }
-            }
-            catch (Exception e)
-            {
-
-                if (e.Message.Equals("Location services are not enabled on device."))
-                {
-
-                    Message("Error", "Servicio de localizacion no encendido");
-                }
-                else
-                {
-                    Message("Error", e.Message);
-
-                }
-
-            }
+            getLatitudeAndLongitude();
         }
-        private async void Message(string title, string message)
-        {
-            await DisplayAlert(title, message, "OK");
-        }
-
-
-
-        private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
-        {
-            bool response = await Application.Current.MainPage.DisplayAlert("Advertencia", "Seleccione el tipo de imagen que desea", "Camara", "Galeria");
-
-            if (response)
-                GetImageFromCamera();
-            else
-                GetImageFromGallery();
-
-        }
-
-        private async void GetImageFromCamera()
-        {
-            var status = await Permissions.CheckStatusAsync<Permissions.Photos>();
-            if (status == PermissionStatus.Granted)
-            {
-                try
-                {
-                    FileFoto = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
-                    {
-                        PhotoSize = PhotoSize.Medium,
-                    });
-
-                    if (FileFoto == null)
-                        return;
-
-                    imgFotoE.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
-                    Image = File.ReadAllBytes(FileFoto.Path);
-                }
-                catch (Exception)
-                {
-                    Message("Advertencia", "Se produjo un error al tomar la fotografia.");
-                }
-            }
-            else
-            {
-                await Permissions.RequestAsync<Permissions.Camera>();
-            }
-        }
-
-        private async void GetImageFromGallery()
-        {
-            try
-            {
-                if (CrossMedia.Current.IsPickPhotoSupported)
-                {
-                    var FileFoto = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
-                    {
-                        PhotoSize = PhotoSize.Medium,
-                    });
-                    if (FileFoto == null)
-                        return;
-
-                    imgFotoE.Source = ImageSource.FromStream(() => { return FileFoto.GetStream(); });
-                    Image = File.ReadAllBytes(FileFoto.Path);
-                }
-                else
-                {
-                    Message("Advertencia", "Se produjo un error al seleccionar la imagen");
-                }
-            }
-            catch (Exception)
-            {
-                Message("Advertencia", "Se produjo un error al seleccionar la imagen");
-            }
-
-        }
-
-        public byte[] ReadFully(Stream input)
-        {
-            byte[] buffer = new byte[16 * 1024];
-            using (MemoryStream ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
-                return ms.ToArray();
-            }
-        }
-
-        private Byte[] ConvertAudioToByteArray()
-        {
-            Stream audioFile = audioRecorderService.GetAudioFileStream();
-
-            //var mStream = new MemoryStream(File.ReadAllBytes(audioRecorderService.GetAudioFilePath()));
-            //var mStream = (MemoryStream)audioFile;
-
-            Byte[] bytes = ReadFully(audioFile);
-            return bytes;
-        }
-
     }
 
 

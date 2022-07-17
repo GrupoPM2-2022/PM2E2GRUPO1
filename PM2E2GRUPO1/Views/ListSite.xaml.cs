@@ -22,7 +22,7 @@ namespace PM2E2GRUPO1.Views
 
 
         public Sitio Site;
-        bool val;
+        bool editando = false;
 
         private readonly AudioPlayer audioPlayer = new AudioPlayer();
 
@@ -31,6 +31,20 @@ namespace PM2E2GRUPO1.Views
             InitializeComponent();
 
             LoadData();
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if(editando)
+            {
+                LoadData();
+
+                editando = false;
+
+                Site = null;
+            }
         }
 
 
@@ -66,12 +80,12 @@ namespace PM2E2GRUPO1.Views
                     DeleteSite(Site);
                 }
                 else {
-                    var siti = Site;
+                   
+                    editando=true;
+
+                    await Navigation.PushModalAsync(new UpdateSite(Site));
+
                     
-                    UpdateSite page = new UpdateSite();
-                    page.BindingContext = siti;
-                    await Navigation.PushAsync(page);
-                    Site = null;
                 }
             }
             catch (Exception ex)
