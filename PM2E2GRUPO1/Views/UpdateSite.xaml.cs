@@ -152,7 +152,7 @@ namespace PM2E2GRUPO1.Views
                 return;
             }
 
-            if (txtDescription.Text.Length > 15)
+            if (txtDescription.Text.Length > 50)
             {
                 Message("Aviso", "Debe escribir una ubicacion corta");
                 

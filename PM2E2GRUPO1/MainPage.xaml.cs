@@ -136,13 +136,13 @@ namespace PM2E2GRUPO1
                 return;
             }
 
-            if (string.IsNullOrEmpty(txtDescription.Text) || txtDescription.Text.Length > 250)
+            if (string.IsNullOrEmpty(txtDescription.Text))
             {
                 Message("Aviso", "Debe escribir una breve Description");
                 return;
             }
 
-            if (txtDescription.Text.Length > 15)
+            if (txtDescription.Text.Length > 50)
             {
                 Message("Aviso", "Debe escribir una ubicacion corta");
 
