@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -156,6 +156,14 @@ namespace PM2E2GRUPO1.Views
 
                 await Task.Delay(500);
                 UserDialogs.Instance.HideLoading();
+
+                var current = Connectivity.NetworkAccess;
+
+                if (current != NetworkAccess.Internet)
+                {
+                    Message("Advertencia", "Actualmente no cuenta con acceso a internet");
+                    return;
+                }
             }
             catch (Exception ex)
             {

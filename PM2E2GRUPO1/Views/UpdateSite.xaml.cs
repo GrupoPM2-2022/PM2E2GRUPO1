@@ -208,6 +208,7 @@ namespace PM2E2GRUPO1.Views
                 if (result)
                 {
                     Message("Aviso", "Sitio actualizado correctamente");
+                    //OnBackButtonPressed();
                     //clearComp();
                 }
                 else
