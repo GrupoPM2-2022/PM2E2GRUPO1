@@ -159,7 +159,7 @@ namespace PM2E2GRUPO1.Views
                 return;
             }
 
-            if (string.IsNullOrEmpty(txtDescription.Text) || txtDescription.Text.Length > 250)
+            if (string.IsNullOrEmpty(txtDescription.Text))
             {
                 Message("Aviso", "Debe escribir una breve Description");
                 return;
