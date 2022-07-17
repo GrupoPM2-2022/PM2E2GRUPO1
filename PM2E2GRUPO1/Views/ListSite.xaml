@@ -22,7 +22,8 @@
         <StackLayout Grid.Row="0">
 
             <ListView x:Name="listSites" 
-                      ItemTapped="listSites_ItemTapped">
+                      ItemTapped="listSites_ItemTapped"
+                      >
 
                 <ListView.ItemTemplate>
                     <DataTemplate>

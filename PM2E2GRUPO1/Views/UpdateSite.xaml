@@ -2,13 +2,27 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PM2E2GRUPO1.Views.UpdateSite"
+             xmlns:Converter="clr-namespace:PM2E2GRUPO1.Converter"
              NavigationPage.HasNavigationBar="False">
-    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Converter:ByteArrayToImage x:Key="ByteToImage" />
+        </ResourceDictionary>
+
+    </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
 
 
             <Grid>
+                <Entry 
+                   Keyboard="Text" 
+                   x:Name="txtIdE" 
+                IsVisible="false"
+                   BackgroundColor="White"
+                   
+                   Text="{Binding Id}"/>
+                
                 <Image Source="logo.png"
                Aspect="AspectFit"
                WidthRequest="110"
@@ -17,7 +31,7 @@
                HorizontalOptions="End"
                />
 
-                <Label Text="SITE VISITOR APP"
+                <Label Text="ACTUALIZAR SITE VISITOR APP"
                    Grid.Row="0"
                    Grid.Column="1"
                    HorizontalOptions="Start"
@@ -31,12 +45,14 @@
                    HorizontalOptions="Center"
                    />
 
-                <Image x:Name="imgFoto"
-                       Source="imgMuestra.png"
+                <Image x:Name="imgFotoE"
+                       Source="{Binding Image,  Converter={StaticResource ByteToImage}}"
                        Aspect="AspectFit"
                        HorizontalOptions="Center" 
                        WidthRequest="300"
-                       HeightRequest="220" >
+                       HeightRequest="220"
+                       
+                      >
 
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
@@ -51,12 +67,13 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Entry x:Name="txtLatitude"
+            <Entry x:Name="txtLatitudeE"
                    Keyboard="Numeric"
                    Placeholder="Ejemplo: 15.67"
                    HorizontalOptions="FillAndExpand" 
                    Margin="30,0,30,0"
                    IsEnabled="False"
+                   Text="{Binding Latitude}"
                    />
 
             <Label Text="Longitud:" 
@@ -64,12 +81,13 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Entry x:Name="txtLongitude"
+            <Entry x:Name="txtLongitudeE"
                    Keyboard="Numeric"
                    Placeholder="Ejemplo: -81.78"
                    HorizontalOptions="FillAndExpand" 
                    Margin="30,0,30,0"
                    IsEnabled="False"
+                   Text="{Binding Longitude}"
                    />
 
             <Label Text="Descripcion:" 
@@ -77,16 +95,17 @@
                HorizontalOptions="StartAndExpand" 
                FontSize="20"/>
 
-            <Editor x:Name="txtDescription"
+            <Editor x:Name="txtDescriptionE"
                     Keyboard="Text"
                     AutoSize="TextChanges"
                     MaxLength="50"
                     HorizontalOptions="FillAndExpand"
                     Margin="30,0,30,0"
                     Placeholder="Lancetilla Tela, Atlantida"
+                    Text="{Binding Description}"
                     />
 
-            <Label Text="Grabar nota de voz"
+            <Label Text="Actualizar nota de voz"
                 x:Name="txtMessage"   
                Margin="30,10,0,0"
                HorizontalOptions="StartAndExpand" 
@@ -99,7 +118,7 @@
 
             <Grid Margin="20,10,30,0">
                 <Button x:Name="btnActualizar"
-                            Text="Agregar"
+                            Text="Actualizar"
                             HorizontalOptions="FillAndExpand"
                             Grid.Column="0"
                             Clicked="btnActualizar_Clicked"/>
