@@ -29,16 +29,8 @@ namespace PM2E2GRUPO1.Views
         public ListSite()
         {
             InitializeComponent();
-        }
-
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
 
             LoadData();
-
-            Site = null;
         }
 
 
@@ -47,8 +39,6 @@ namespace PM2E2GRUPO1.Views
             try
             {
                 Site = e.Item as Sitio;
-
-                listeAudio(Site.AudioFile);
             }
             catch (Exception ex)
             {
@@ -100,9 +90,11 @@ namespace PM2E2GRUPO1.Views
 
                 if (result)
                 {
-                    Message("Aviso", "El sitio fue eliminado correctamente");
+                    //Message("Aviso", "El sitio fue eliminado correctamente");
                     Site = null;
                     LoadData();
+
+                    Site = null;
                 }
                 else
                 {
@@ -126,7 +118,7 @@ namespace PM2E2GRUPO1.Views
 
                 if (status)
                 {
-                    await Navigation.PushAsync(new MapPage(Site));
+                    await Navigation.PushModalAsync(new MapPage(Site));
                 }
 
             }
@@ -142,6 +134,8 @@ namespace PM2E2GRUPO1.Views
 
             try
             {
+                await Task.Delay(1000);
+
                 UserDialogs.Instance.ShowLoading("Cargando", MaskType.Gradient);
 
                 listSites.ItemsSource = await SitioController.GetAllSite();
@@ -202,6 +196,30 @@ namespace PM2E2GRUPO1.Views
                 Message("Error: ", ex.Message);
             }
 
+        }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            OnBackButtonPressed();
+        }
+
+        private void btnViewListen_Clicked(object sender, EventArgs e)
+        {
+
+            if (Site == null)
+            {
+                Message("Aviso", "Seleccione un sitio");
+                return;
+            }
+
+            try
+            {
+                listeAudio(Site.AudioFile);
+            }
+            catch (Exception ex)
+            {
+                Message("Error:", ex.Message);
+            }
         }
     }
 }

@@ -199,7 +199,7 @@ namespace PM2E2GRUPO1
 
         private async void btnList_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ListSite());
+            await Navigation.PushModalAsync(new ListSite());
         }
 
         private async void getLatitudeAndLongitude()

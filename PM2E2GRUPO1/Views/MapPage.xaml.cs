@@ -98,10 +98,23 @@ namespace PM2E10280.Views
 
         private async void btnNavegar_Clicked(object sender, EventArgs e)
         {
-            var location = new Location(Sitio.Latitude, Sitio.Longitude);
-            var options = new MapLaunchOptions { NavigationMode = NavigationMode.Driving };
+            try
+            {
+                var location = new Location(Sitio.Latitude, Sitio.Longitude);
+                var options = new MapLaunchOptions { NavigationMode = NavigationMode.Driving };
 
-            await Xamarin.Essentials.Map.OpenAsync(location, options);
+                await Xamarin.Essentials.Map.OpenAsync(location, options);
+            }
+            catch (Exception ex)
+            {
+
+                Message("Error", ex.Message);
+            }
+        }
+
+        private void Button_Clicked_1(object sender, EventArgs e)
+        {
+            OnBackButtonPressed();
         }
     }
 }
