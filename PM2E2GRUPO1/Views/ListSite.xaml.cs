@@ -21,7 +21,7 @@ namespace PM2E2GRUPO1.Views
     {
 
 
-        public Sitio Site = null;
+        public Sitio Site;
         bool val;
 
         private readonly AudioPlayer audioPlayer = new AudioPlayer();
@@ -72,13 +72,14 @@ namespace PM2E2GRUPO1.Views
                 if (response)
                 {
                     //Delete
+                    var sit = Site;
                     DeleteSite(Site);
                 }
                 else {
-                    var persona = Site;
+                    var siti = Site;
                     
                     UpdateSite page = new UpdateSite();
-                    page.BindingContext = persona;
+                    page.BindingContext = siti;
                     await Navigation.PushAsync(page);
                     Site = null;
                 }
@@ -165,6 +166,7 @@ namespace PM2E2GRUPO1.Views
         {
             await DisplayAlert(title, message, "OK");
         }
+
 
         #endregion Metodos Utiles
 
