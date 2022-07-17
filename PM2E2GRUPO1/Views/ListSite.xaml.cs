@@ -29,10 +29,6 @@ namespace PM2E2GRUPO1.Views
         public ListSite()
         {
             InitializeComponent();
-
-            //Para que al inicializar cree la base de datos y no de error, y no esperar a
-            //llamar la instancia para crearla
-            //if (App.DBase == null) Debug.WriteLine("Creando base de datos");
         }
 
 
@@ -145,7 +141,7 @@ namespace PM2E2GRUPO1.Views
 
             try
             {
-                UserDialogs.Instance.ShowLoading("Cargando", MaskType.Clear);
+                UserDialogs.Instance.ShowLoading("Cargando", MaskType.Gradient);
 
                 listSites.ItemsSource = await SitioController.GetAllSite();
 
@@ -174,18 +170,8 @@ namespace PM2E2GRUPO1.Views
 
         private void listeAudio(byte[] bytes)
         {
-            //using (MemoryStream ms = new MemoryStream(bytes))
-            //{
-            // Construct the sound player
-            //audioPlayer.Play(ms.);
-            //}
-
 
             var folderPath = "/storage/emulated/0/Android/data/com.companyname.pm2e2grupo1/files/Audio";
-
-           
-
-            //var nameAudio = DateTime.Now.ToString("MMddyyyyhhmmss") + ".wav";
 
             var nameAudio = "temp.wav";
 

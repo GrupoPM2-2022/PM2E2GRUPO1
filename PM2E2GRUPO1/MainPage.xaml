@@ -7,22 +7,24 @@
     <ScrollView>
         <StackLayout>
 
+            <Frame Grid.Row="0" Padding="0,0,0,0">
+                
+                <Label Text="Nueva Ubicacion" 
+                       HorizontalOptions="Center"
+                       TextColor="Black" 
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       />
+            </Frame>
+
             <Grid>
                 <Image Source="logo.png"
                Aspect="AspectFit"
                WidthRequest="110"
                Grid.Row="0"
-               Grid.Column="0"
-               HorizontalOptions="End"
+               Grid.ColumnSpan="2"
+               HorizontalOptions="Center"
                />
-
-                <Label Text="SITE VISITOR APP"
-                   Grid.Row="0"
-                   Grid.Column="1"
-                   HorizontalOptions="Start"
-                   VerticalOptions="Center"
-                   />
-
             </Grid>
 
             <StackLayout>
@@ -93,10 +95,10 @@
 
             <Button Text="Grabar audio" 
                     x:Name="btnGrabar" 
-                    Margin="30,0,30,0"
+                    Margin="20,0,20,0"
                     Clicked="btnGrabar_Clicked"/>
 
-            <Grid Margin="20,10,30,0">
+            <Grid Margin="20,10,20,0">
                 <Button x:Name="btnAdd"
                             Text="Agregar"
                             HorizontalOptions="FillAndExpand"
@@ -110,14 +112,6 @@
                             Clicked="btnList_Clicked"/>
             </Grid>
 
-
-            <Button x:Name="btnExit"
-                        Text="Salir de la app"
-                        HorizontalOptions="Center"
-                        Margin="10,0,0,20"
-                        Grid.Column="1"
-                        Clicked="btnExit_Clicked"
-                        />
 
         </StackLayout>
     </ScrollView>

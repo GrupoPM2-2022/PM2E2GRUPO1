@@ -92,6 +92,7 @@ namespace PM2E2GRUPO1
                     FileFoto = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
                     {
                         PhotoSize = PhotoSize.Medium,
+                        SaveToAlbum = true
                     });
 
                     if (FileFoto == null)
@@ -109,11 +110,6 @@ namespace PM2E2GRUPO1
             {
                 await Permissions.RequestAsync<Permissions.Camera>();
             }
-        }
-
-        private void btnExit_Clicked(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.GetCurrentProcess().CloseMainWindow();
         }
 
         private async void btnAdd_Clicked(object sender, EventArgs e)
@@ -220,7 +216,6 @@ namespace PM2E2GRUPO1
                 }
                 else
                 {
-
                     await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
                 }
             }
@@ -235,7 +230,6 @@ namespace PM2E2GRUPO1
                 else
                 {
                     Message("Error", e.Message);
-
                 }
 
             }
@@ -306,6 +300,9 @@ namespace PM2E2GRUPO1
                     audioPlayer.Play(audioRecorderService.GetAudioFilePath());
 
                     txtMessage.Text = "No esta grabando";
+
+                    txtMessage.TextColor = Color.Red;
+
                     btnGrabar.Text = "Grabar audio";
 
                     reproducir = true;
@@ -316,6 +313,8 @@ namespace PM2E2GRUPO1
 
 
                     txtMessage.Text = "Esta grabando";
+                    
+                    txtMessage.TextColor = Color.Green;
 
                     btnGrabar.Text = "Dejar de Grabar";
 
